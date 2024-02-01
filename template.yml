@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Coupon Service
+
+Resources:
+  CouponServiceFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: com.example.couponservice.CouponService::handleRequest
+      Runtime: java17
+      CodeUri: ./
+      Timeout: 30
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /restaurant/confirmation/{argument}
+            Method: POST
+      Environment:
+        Variables:
+          DynamoDBCouponsTable: !Ref DynamoDBCouponTable
+          DynamoDBReservationTable: !Ref DynamoDBReservationTable
+
+  DynamoDBCouponTable:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      PrimaryKey:
+        Name: couponId
+        Type: String
+
+  DynamoDBReservationTable:
+    Type: 'AWS::Serverless::SimpleTable'
+    Properties:
+      PrimaryKey:
+        Name: reservationId
+        Type: String
+
+Outputs:
+  CouponServiceApi:
+    Description: API Gateway endpoint URL for Coupon Service
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/restaurant/confirmation
