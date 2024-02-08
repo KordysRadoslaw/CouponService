@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class CouponHandler {
+public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
 //    private final static SecureRandom random = new SecureRandom();
     private final DynamoDBService dynamoDBServiceCoupon;
@@ -51,13 +52,13 @@ public class CouponHandler {
 
         String requestBody = apiGatewayProxyRequestEvent.getBody();
         Gson gson = new Gson();
-        //tutaj popraw
+
         Map<String, String> requestDetails = gson.fromJson(requestBody, Map.class);
 
         String tokenIdFromPath = apiGatewayProxyRequestEvent.getQueryStringParameters().get("tokenId");
 
         if (tokenIdFromPath == null || tokenIdFromPath.isEmpty()) {
-            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Brak parametru 'tokenId' w ścieżce.");
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Token ID not found in request path");
         }
 
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -84,9 +85,9 @@ public class CouponHandler {
             }
         }catch(Exception e){
 
-            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("blad  " + e);
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("error  " + e);
         }
-        return new APIGatewayProxyResponseEvent().withBody("uzytkownik to: " + user + " gratulacje byku");
+        return new APIGatewayProxyResponseEvent().withBody("user is: " + user + " congratulations! You have received a coupon!");
     }
 
     public APIGatewayProxyResponseEvent useCoupon(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
@@ -100,7 +101,7 @@ public class CouponHandler {
                 String couponId = requestDetails.get("couponId");
 
                 if(couponId == null || couponId.isEmpty()){
-                    return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Brak parametru 'couponId' w ciele zapytania.");
+                    return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Coupon ID not found in request body");
                 }
                 Map<String, String> userCoupon = dynamoDBServiceCoupon.getCoupon(couponId);
                 if(userCoupon.get("used").equals("true")){
@@ -113,7 +114,7 @@ public class CouponHandler {
                 return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Coupon not found");
 
             } catch (JsonSyntaxException e) {
-                return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Nieprawidłowy format JSON w ciele zapytania.");
+                return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid JSON format");
             }
         }else {
             return new APIGatewayProxyResponseEvent().withStatusCode(405).withBody("Wrong HTTP method. Use POST.");
