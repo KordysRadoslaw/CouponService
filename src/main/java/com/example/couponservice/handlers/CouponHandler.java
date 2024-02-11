@@ -76,6 +76,7 @@ public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
 
+
         User user = null;
         try {
             user = userRepository.getByTokenId(tokenIdFromQueryParameters);
