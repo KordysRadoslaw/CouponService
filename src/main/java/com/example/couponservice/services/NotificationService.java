@@ -6,6 +6,9 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClient;
 import com.amazonaws.services.simpleemail.model.*;
 
+/**
+ * Notification Service interface defines methods for sending email notifications to the users.
+ */
 public interface NotificationService {
 
 

@@ -27,6 +27,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+/**
+ * AWS Lambda handler for processing coupon requests.
+ *
+ * This handler class handles incoming HTTP requests for generating and managing coupons.
+ * It interacts with DynamoDB for user and coupon data storage, and uses SES for sending notification emails.
+ */
 public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private final CouponRepository couponRepository;
@@ -34,7 +40,6 @@ public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
     private final NotificationService notificationService;
 
-    // Konstruktor z argumentami
     public CouponHandler(CouponRepository couponRepository, UserRepository userRepository, NotificationService notificationService) {
         this.couponRepository = couponRepository;
         this.userRepository = userRepository;
@@ -42,7 +47,6 @@ public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent
 
     }
 
-    // Konstruktor bezargumentowy
     public CouponHandler() {
         AmazonDynamoDB amazonDynamoDBCoupon = AmazonDynamoDBClientBuilder.defaultClient();
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(System.getenv("MY_AWS_ACCESS_KEY_ID"), System.getenv("MY_AWS_SECRET_ACCESS_KEY"));
@@ -59,6 +63,15 @@ public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent
     }
 
 
+    /**
+     * Handles incoming Lambda requests.
+     *
+     * Dispatches requests based on the HTTP path and method.
+     *
+     * @param apiGatewayProxyRequestEvent The Lambda Function input containing request details.
+     * @param context The Lambda execution environment context object.
+     * @return An APIGatewayProxyResponseEvent object representing the Lambda function response.
+     */
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
         LambdaLogger logger = context.getLogger();
@@ -95,6 +108,11 @@ public class CouponHandler implements RequestHandler<APIGatewayProxyRequestEvent
         return new APIGatewayProxyResponseEvent().withStatusCode(200).withBody("Coupon code generated and sent to user");
     }
 
+    /**
+     * @param apiGatewayProxyRequestEvent The Lambda Function input containing request details.
+     * @param context The Lambda execution environment context object.
+     * @return An APIGatewayProxyResponseEvent object representing the Lambda function response.
+     */
     public APIGatewayProxyResponseEvent useCoupon(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
         LambdaLogger logger = context.getLogger();
         logger.log("Handling http post for /restaurant/confirmation/useCoupon API endpoint");

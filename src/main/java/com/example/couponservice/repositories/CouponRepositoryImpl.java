@@ -8,6 +8,10 @@ import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.example.couponservice.model.Coupon;
 
+/**
+ * Implementation of the CouponRepository interface
+ */
+
 public class CouponRepositoryImpl implements CouponRepository{
 
     private final Table couponTable;
@@ -17,6 +21,14 @@ public class CouponRepositoryImpl implements CouponRepository{
     }
 
 
+    /**
+     * Retrieves a Coupon object based on the provided coupon ID.
+     *
+     * @param couponId The unique identifier of the coupon to retrieve.
+     * @return A Coupon object representing the retrieved coupon information,
+     *         or null if no coupon is found.
+     * @throws RuntimeException If an error occurs while accessing the DynamoDB table.
+     */
     @Override
     public Coupon getCouponById(String couponId) {
         try{
@@ -30,6 +42,14 @@ public class CouponRepositoryImpl implements CouponRepository{
         }
     }
 
+    /**
+     * Updates the "used" status of a coupon in DynamoDB.
+     *
+     * @param couponId The unique identifier of the coupon to update.
+     * @param status The new "used" status for the coupon (true - used, false - unused).
+     * @return True if the update operation was successful, false otherwise.
+     * @throws RuntimeException If an error occurs while updating the DynamoDB table.
+     */
     @Override
     public boolean updateCouponStatus(String couponId, boolean status) {
         try{
@@ -46,7 +66,14 @@ public class CouponRepositoryImpl implements CouponRepository{
         }
 
     }
-
+    /**
+     * Saves a new coupon to DynamoDB.
+     *
+     * @param date The date the coupon was generated.
+     * @param email The email address associated with the coupon.
+     * @param couponCode The unique code for the coupon.
+     * @throws RuntimeException If an error occurs while saving the coupon to DynamoDB.
+     */
     @Override
     public void saveCoupon(String date, String email, String couponCode) {
         try{
@@ -62,6 +89,12 @@ public class CouponRepositoryImpl implements CouponRepository{
         }
     }
 
+    /**
+     * Creates a Coupon object from a DynamoDB Item representing a coupon.
+     *
+     * @param item The DynamoDB Item containing coupon data.
+     * @return A Coupon object representing the retrieved coupon information.
+     */
     private Coupon createCouponFromItem(Item item){
         Coupon coupon = new Coupon();
         coupon.setCouponId(item.getString("couponId"));
