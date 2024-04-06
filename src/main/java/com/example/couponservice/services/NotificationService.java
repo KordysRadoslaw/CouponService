@@ -11,7 +11,12 @@ import com.amazonaws.services.simpleemail.model.*;
  */
 public interface NotificationService {
 
-
+    /**
+     * Sends a coupon notification email to the provided recipient address.
+     *
+     * @param coupon The coupon code to include in the email body.
+     * @param email The recipient's email address.
+     */
     public void sendCouponEmail(String coupon, String email);
 
 }
